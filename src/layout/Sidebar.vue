@@ -4,47 +4,7 @@
       <!-- Logo removed for density -->
     </div>
 
-    <nav 
-      class="navigation" 
-      ref="navListRef" 
-      data-tauri-drag-region
-    >
-      <div 
-        v-if="highlight.visible"
-        class="nav-shared-highlight"
-        aria-hidden="true"
-        :style="highlightStyles"
-      ></div>
-
-      <router-link 
-        v-for="item in navItems" 
-        :key="item.key"
-        :to="item.path" 
-        custom
-        v-slot="{ href, navigate, isActive }"
-      >
-        <motion.a
-          :href="href"
-          :class="['nav-item', `nav-${item.key}`, { 'is-active': isActive }]"
-          @click="(event) => handleNavClick(event, navigate, item.path)"
-          :ref="(el) => setNavItemRef(item.key, el)"
-          whileHover="{ scale: 1 }"
-          whileTap="{ scale: 0.98 }"
-        >
-          <div class="nav-content">
-            <span class="nav-icon">
-              <img :src="item.logo" :alt="item.name" />
-            </span>
-            <span class="nav-name">{{ item.name }}</span>
-          </div>
-          <motion.div 
-            v-if="isActive"
-            class="active-dot"
-            layoutId="activeDot"
-          ></motion.div>
-        </motion.a>
-      </router-link>
-    </nav>
+    <!-- 平台入口已移至顶部导航栏，侧边栏仅保留关注列表 -->
     
     <div class="follow-list-wrapper">
       <FollowList 
@@ -59,109 +19,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, reactive, watch, nextTick, onMounted, onBeforeUnmount } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
-import { motion } from 'motion-v';
+import { ref, computed } from 'vue';
 import type { FollowedStreamer } from '../platforms/common/types';
 import FollowList from '../components/FollowsList/index.vue';
-import douyuLogo from '../assets/douyu.webp';
-import douyinLogo from '../assets/douyin.webp';
-import huyaLogo from '../assets/huya.webp';
-import bilibiliLogo from '../assets/bilibili.webp';
 
-const emit = defineEmits(['selectAnchor', 'unfollow', 'navigate', 'reorderList']);
-const router = useRouter();
-const route = useRoute();
+const emit = defineEmits(['selectAnchor', 'unfollow', 'reorderList']);
 
-type PlatformKey = 'douyu' | 'douyin' | 'huya' | 'bilibili';
-
-type NavItem = {
-  key: PlatformKey;
-  name: string;
-  path: string;
-  logo: string;
-};
-
-const navItems = ref<NavItem[]>([
-  { key: 'douyu', name: '斗鱼直播', path: '/', logo: douyuLogo },
-  { key: 'douyin', name: '抖音直播', path: '/douyin', logo: douyinLogo },
-  { key: 'huya', name: '虎牙直播', path: '/huya', logo: huyaLogo },
-  { key: 'bilibili', name: 'B站直播', path: '/bilibili', logo: bilibiliLogo },
-]);
-
-const props = withDefaults(defineProps<{
-  followedAnchors?: FollowedStreamer[];
-}>(), {
+const props = withDefaults(defineProps<{ followedAnchors?: FollowedStreamer[] }>(), {
   followedAnchors: () => []
-});
-
-const navListRef = ref<HTMLElement | null>(null);
-const navItemRefs = new Map<PlatformKey, HTMLElement>();
-
-const highlight = reactive({
-  offset: 0,
-  height: 0,
-  visible: false,
-});
-
-const activePlatformKey = computed<PlatformKey | null>(() => {
-  const match = navItems.value.find(item => item.path === route.path);
-  return match?.key ?? null;
-});
-
-const highlightStyles = computed(() => ({
-  transform: `translateY(${highlight.offset}px)`,
-  height: `${highlight.height}px`,
-  opacity: highlight.visible ? 1 : 0,
-}));
-
-const updateHighlight = () => {
-  nextTick(() => {
-    const key = activePlatformKey.value;
-    if (!key) {
-      highlight.visible = false;
-      return;
-    }
-    const el = navItemRefs.get(key);
-    const container = navListRef.value;
-    if (!el || !container) {
-      highlight.visible = false;
-      return;
-    }
-    highlight.offset = el.offsetTop;
-    highlight.height = el.offsetHeight;
-    highlight.visible = true;
-  });
-};
-
-const setNavItemRef = (key: PlatformKey, el: any) => {
-  if (!el) {
-    navItemRefs.delete(key);
-    return;
-  }
-  const element = el.$el || el;
-  if (element instanceof HTMLElement) {
-    navItemRefs.set(key, element);
-    if (key === activePlatformKey.value) {
-      updateHighlight();
-    }
-  }
-};
-
-const handleNavClick = (event: MouseEvent, navigate: (e?: MouseEvent) => void, path: string) => {
-  navigate(event);
-  emit('navigate', path);
-};
-
-watch(() => route.path, () => updateHighlight(), { immediate: true });
-
-onMounted(() => {
-  window.addEventListener('resize', updateHighlight);
-  updateHighlight();
-});
-
-onBeforeUnmount(() => {
-  window.removeEventListener('resize', updateHighlight);
 });
 
 const customSortedAnchors = ref<FollowedStreamer[]>([]);
@@ -199,8 +64,6 @@ const handleReorderList = (reorderedList: FollowedStreamer[]) => {
   customSortedAnchors.value = [...reorderedList];
   emit('reorderList', reorderedList);
 };
-
-defineExpose({ router });
 </script>
 
 <style scoped>

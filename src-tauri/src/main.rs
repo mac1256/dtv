@@ -6,6 +6,7 @@ use std::collections::HashMap;
 use std::env;
 use std::sync::{Arc, Mutex};
 use tokio::sync::oneshot;
+use tauri::Manager;
 mod platforms;
 mod proxy;
 use platforms::common::{DouyinDanmakuState, FollowHttpClient, HuyaDanmakuState};
@@ -156,6 +157,20 @@ fn main() {
 
     tauri::Builder::default()
         .plugin(tauri_plugin_os::init())
+        .setup(|app| {
+            // Apply macOS vibrancy to the main window when running on macOS
+            #[cfg(target_os = "macos")]
+            {
+                use window_vibrancy::{apply_vibrancy, NSVisualEffectMaterial};
+                if let Some(window) = app.get_webview_window("main") {
+                    match apply_vibrancy(&window, NSVisualEffectMaterial::HudWindow, None, None) {
+                        Ok(_) => println!("vibrancy applied successfully"),
+                        Err(e) => eprintln!("vibrancy error: {:?}", e),
+                    }
+                }
+            }
+            Ok(())
+        })
         .manage(client) // Manage the reqwest client
         .manage(follow_http_client) // 专用关注刷新客户端，避免占用默认连接池
         .manage(DouyuDanmakuHandles::default()) // Manage new DouyuDanmakuHandles

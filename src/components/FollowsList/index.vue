@@ -210,7 +210,7 @@
   const hoveredIndex = ref<number | null>(null);
   const hoverHighlight = reactive({ x: 0, y: 0, width: 0, height: 0, visible: false });
   const hoverHighlightInitial = { x: 0, y: 0, width: 0, height: 32, opacity: 0 };
-  const hoverHighlightTransition = { type: 'spring', stiffness: 280, damping: 28, mass: 0.7 };
+  const hoverHighlightTransition = { type: 'spring', stiffness: 280, damping: 28, mass: 0.7 } as const;
   const itemRefs = new Map<number, HTMLElement>();
   const layoutMode = computed<'full' | 'icons'>(() => {
     const width = streamersListRef.value?.clientWidth || 0;
@@ -503,9 +503,11 @@
     }
     const listRect = listEl.getBoundingClientRect();
     const itemRect = itemEl.getBoundingClientRect();
+    const scrollLeft = listEl.scrollLeft;
+    const scrollTop = listEl.scrollTop;
     const isIcons = layoutMode.value === 'icons';
-    hoverHighlight.x = isIcons ? 0 : (itemRect.left - listRect.left);
-    hoverHighlight.y = itemRect.top - listRect.top;
+    hoverHighlight.x = isIcons ? 0 : (itemRect.left - listRect.left + scrollLeft);
+    hoverHighlight.y = itemRect.top - listRect.top + scrollTop;
     hoverHighlight.width = isIcons ? listRect.width : itemRect.width;
     hoverHighlight.height = itemRect.height;
     hoverHighlight.visible = true;

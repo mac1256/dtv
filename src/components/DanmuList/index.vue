@@ -90,16 +90,6 @@ const handleScroll = () => {
   autoScroll.value = atBottom && !pointerActive.value;
 };
   
-  const scrollToBottom = () => {
-    nextTick(() => {
-      if (danmakuListEl.value && autoScroll.value && !userScrolled.value) {
-        const el = danmakuListEl.value;
-        el.scrollTop = el.scrollHeight;
-      } else {
-      }
-    });
-  };
-
 watch(autoScroll, (newValue) => {
   if (newValue) {
     userScrolled.value = false;

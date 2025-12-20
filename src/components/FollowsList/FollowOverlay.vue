@@ -126,7 +126,7 @@ watch(() => props.show, (val) => {
 
 // 参考值与动态测量
 const PANEL_MIN = 220;
-const PANEL_MAX_MARGIN = 120; // 留出顶部/底部边距
+const PANEL_MAX_MARGIN = 180; // 留出顶部/底部边距，增加底部空间
 const DEFAULT_CARD_H = 76; // 估算：48头像 + 24内边距 + 2边框
 const DEFAULT_CARD_W = 200;
 const LIST_PAD_TOP = 6;
@@ -250,7 +250,7 @@ const handleSelect = (s: FollowedStreamer) => {
   justify-content: flex-start;
   gap: 16px;
   padding: 20px 32px;
-  border-bottom: 1px solid var(--border-color-light);
+  border-bottom: none;
 }
 
 .overlay-header-left {
@@ -320,7 +320,7 @@ const handleSelect = (s: FollowedStreamer) => {
 
 .overlay-content {
   overflow: auto;
-  padding: 24px 32px;
+  padding: 24px 32px 36px; /* 增加底部内边距，避免内容贴底 */
 }
 
 .overlay-content::-webkit-scrollbar {
@@ -350,8 +350,8 @@ const handleSelect = (s: FollowedStreamer) => {
 
 .overlay-streamers-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 12px;
   list-style: none;
   margin: 0;
   padding: 0;
@@ -373,28 +373,7 @@ const handleSelect = (s: FollowedStreamer) => {
   box-shadow: var(--card-shadow-hover);
 }
 
-:root[data-theme="light"] .follow-overlay-panel {
-  background: #e4e9e5;
-  border-color: #cfd3cf;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
-  backdrop-filter: blur(12px);
-}
-
-:root[data-theme="light"] .overlay-header,
-:root[data-theme="light"] .overlay-content {
-  background: transparent;
-}
-
-:root[data-theme="light"] .overlay-streamer-item {
-  background: #e4e9e5;
-  border-color: #cfd3cf;
-}
-
-:root[data-theme="light"] .overlay-streamer-item:hover {
-  background: #d8ddd9;
-  border-color: #b8beb9;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
-}
+/* Keep follow overlay using glass-style background across themes to match search results */
 
 .overlay-remove-btn {
   position: absolute;

@@ -288,7 +288,7 @@ const goToPlayer = (roomId: string) => {
   cursor: pointer;
   border: 1px solid var(--glass-border);
   transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-  padding: 10px;
+  padding: 8px;
 }
 
 .streamer-card-common:hover {
@@ -390,7 +390,7 @@ const goToPlayer = (roomId: string) => {
 
 .viewers-count-overlay-common {
   position: absolute;
-  bottom: 8px;
+  top: 8px;
   right: 10px;
   background: rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(12px);
@@ -408,8 +408,8 @@ const goToPlayer = (roomId: string) => {
 
 .card-info-footer-common {
   display: flex;
-  padding: 10px 8px 4px 8px;
-  gap: 10px;
+  padding: 6px 8px 2px 8px;
+  gap: 8px;
   align-items: center;
 }
 

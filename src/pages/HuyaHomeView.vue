@@ -43,8 +43,8 @@ const onCategorySelected = (categoryEvent: CategorySelectedEvent) => {
 
 .huya-category-section {
   flex-shrink: 0;
-  background: var(--glass-bg);
-  backdrop-filter: blur(8px);
+  background: transparent;
+  backdrop-filter: var(--glass-blur);
   z-index: 10;
 }
 

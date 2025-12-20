@@ -31,7 +31,7 @@
         <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
       </svg>
       <span class="folder-name">{{ folder.name }}</span>
-      <span class="folder-count">({{ folder.streamerIds.length }})</span>
+      <span class="folder-count">{{ folder.streamerIds.length }}</span>
       <motion.span
         class="expand-icon"
         :animate="{ rotate: folder.expanded ? 180 : 0 }"
@@ -52,30 +52,42 @@
         </svg>
       </motion.span>
     </div>
-    <AnimatePresence>
+    <AnimatePresence :initial="false">
       <motion.div
         v-if="folder.expanded && folderItems.length > 0"
         class="folder-content"
         :class="{ 'disable-pointer': globalDragging }"
+        ref="folderContentRef"
+        @mouseleave="handleFolderContentMouseLeave"
         :initial="{ height: 0, opacity: 0 }"
         :animate="{ height: 'auto', opacity: 1 }"
         :exit="{ height: 0, opacity: 0 }"
-        :transition="{ duration: 0.22, ease: [0.25, 0.8, 0.4, 1] }"
+        :transition="{ duration: 0.2, ease: [0.2, 0.8, 0.2, 1] }"
         >
+        <motion.div
+          class="folder-hover-highlight"
+          :initial="folderHoverHighlightInitial"
+          :animate="folderHoverHighlightMotion"
+          :transition="folderHoverHighlightTransition"
+          aria-hidden="true"
+          :style="{ borderRadius: '12px', minHeight: '38px' }"
+        />
         <ul class="folder-streamers-list">
           <motion.li
-            v-for="streamer in folderItems"
+            v-for="(streamer, index) in folderItems"
             :key="`${streamer.platform}:${streamer.id}`"
             class="folder-streamer-item"
             :class="getStreamerItemClass(streamer)"
-            :initial="{ opacity: 0, y: -4 }"
-            :animate="{ opacity: 1, y: 0 }"
-            :exit="{ opacity: 0, y: -4 }"
-            :transition="{ duration: 0.18, ease: [0.25, 0.8, 0.4, 1] }"
+            :initial="false"
+            :animate="{ y: 0 }"
+            :exit="{ y: -4, opacity: 0 }"
+            :transition="{ duration: 0.16, ease: [0.2, 0.8, 0.2, 1] }"
+            :ref="(el) => setFolderItemRef(index, el)"
+            @mouseenter="handleFolderItemMouseEnter(index)"
             @click.stop="handleClick(streamer)"
             @mousedown.stop="(e) => handleFolderStreamerMouseDown(streamer, e)"
             @mouseup.stop="handleFolderStreamerMouseUp"
-            @mouseleave="handleFolderStreamerMouseUp"
+            @mouseleave="() => { handleFolderItemMouseLeave(index); handleFolderStreamerMouseUp(); }"
           >
             <StreamerItem 
               :streamer="streamer"
@@ -93,7 +105,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, nextTick, onBeforeUnmount, reactive, ref, watch } from 'vue';
 import { AnimatePresence, motion } from 'motion-v';
 import type { FollowedStreamer } from '../../platforms/common/types';
 import type { FollowFolder } from '../../store/followStore';
@@ -154,6 +166,98 @@ const folderItems = computed(() => {
     }
   }
   return sortStreamersByStatus(result);
+});
+
+const folderContentRef = ref<HTMLElement | null>(null);
+const folderItemRefs = new Map<number, HTMLElement>();
+const hoveredFolderIndex = ref<number | null>(null);
+const folderHoverHighlight = reactive({ x: 0, y: 0, width: 0, height: 0, visible: false });
+const folderHoverHighlightInitial = { x: 0, y: 0, width: 0, height: 32, opacity: 0 };
+const folderHoverHighlightTransition = { type: 'spring', stiffness: 280, damping: 28, mass: 0.7 } as const;
+const folderHoverHighlightMotion = computed(() => ({
+  x: folderHoverHighlight.x,
+  y: folderHoverHighlight.y,
+  width: folderHoverHighlight.width,
+  height: folderHoverHighlight.height,
+  opacity: folderHoverHighlight.visible ? 1 : 0,
+}));
+
+const resolveElement = (el: any): HTMLElement | null => {
+  if (!el) return null;
+  const element = el?.$el ?? el;
+  return element instanceof HTMLElement ? element : null;
+};
+
+const recomputeFolderHoverHighlight = () => {
+  const index = hoveredFolderIndex.value;
+  if (index === null) {
+    folderHoverHighlight.visible = false;
+    return;
+  }
+  const contentEl = resolveElement(folderContentRef.value);
+  const itemEl = folderItemRefs.get(index);
+  if (!contentEl || !itemEl) {
+    folderHoverHighlight.visible = false;
+    return;
+  }
+  const contentRect = contentEl.getBoundingClientRect();
+  const itemRect = itemEl.getBoundingClientRect();
+  const scrollLeft = contentEl.scrollLeft;
+  const scrollTop = contentEl.scrollTop;
+  folderHoverHighlight.x = itemRect.left - contentRect.left + scrollLeft;
+  folderHoverHighlight.y = itemRect.top - contentRect.top + scrollTop;
+  folderHoverHighlight.width = itemRect.width;
+  folderHoverHighlight.height = itemRect.height;
+  folderHoverHighlight.visible = true;
+};
+
+const setFolderItemRef = (index: number, el: any) => {
+  if (!el) {
+    folderItemRefs.delete(index);
+    return;
+  }
+  const element = el?.$el ?? el;
+  if (element instanceof HTMLElement) {
+    folderItemRefs.set(index, element);
+    if (hoveredFolderIndex.value === index) {
+      nextTick(recomputeFolderHoverHighlight);
+    }
+  }
+};
+
+const handleFolderItemMouseEnter = (index: number) => {
+  hoveredFolderIndex.value = index;
+  nextTick(recomputeFolderHoverHighlight);
+};
+
+const handleFolderItemMouseLeave = (index: number) => {
+  if (hoveredFolderIndex.value === index) {
+    hoveredFolderIndex.value = null;
+    folderHoverHighlight.visible = false;
+  }
+};
+
+const handleFolderContentMouseLeave = () => {
+  hoveredFolderIndex.value = null;
+  folderHoverHighlight.visible = false;
+};
+
+watch(folderItems, () => {
+  folderItemRefs.clear();
+  hoveredFolderIndex.value = null;
+  folderHoverHighlight.visible = false;
+  nextTick(recomputeFolderHoverHighlight);
+});
+
+watch(() => props.folder.expanded, (expanded) => {
+  if (!expanded) {
+    hoveredFolderIndex.value = null;
+    folderHoverHighlight.visible = false;
+  }
+});
+
+onBeforeUnmount(() => {
+  folderItemRefs.clear();
 });
 
 const toggleExpand = () => emit('toggleExpand', props.folder.id);
@@ -327,20 +431,19 @@ const getStreamerItemClass = (streamer: FollowedStreamer) => {
 .folder-item {
   position: relative;
   margin-bottom: 8px;
-  border-radius: 18px;
-  background: transparent;
+  border-radius: 40px;
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  box-shadow: none;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   overflow: hidden;
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: box-shadow 0.25s ease, background 0.25s ease, border-color 0.25s ease;
   user-select: none;
 }
 
 .folder-item.is-expanded {
-  background: var(--glass-bg);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--glass-border);
-  box-shadow: var(--glass-shadow);
-  transform: scale(1.02);
+  background: var(--color-card);
 }
 
 .folder-item.is-drag-over {
@@ -355,18 +458,16 @@ const getStreamerItemClass = (streamer: FollowedStreamer) => {
   padding: 10px 16px;
   cursor: pointer;
   border-radius: 14px;
-  transition: all 0.3s ease;
-  background: var(--tertiary-bg);
-  border: 1px solid var(--border-color-light);
+  transition: all 0.25s ease;
+  background: transparent;
+  border: none;
 }
 
 .folder-header:hover {
-  background: var(--hover-bg);
-  border-color: var(--accent-color);
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .folder-item.is-drag-over .folder-header {
-  border-color: var(--accent-color);
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent-color) 28%, transparent);
 }
 
@@ -417,8 +518,38 @@ const getStreamerItemClass = (streamer: FollowedStreamer) => {
 }
 
 .folder-content {
-  padding: 8px 6px 14px;
+  padding: 10px 12px 16px;
+  position: relative;
   overflow: hidden;
+}
+
+.folder-hover-highlight {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.08));
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: none;
+  opacity: 0;
+  transform: translate3d(0, 0, 0);
+  transition:
+    transform 220ms cubic-bezier(0.16, 1, 0.3, 1),
+    width 220ms cubic-bezier(0.16, 1, 0.3, 1),
+    height 220ms cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 120ms ease;
+  z-index: 0;
+}
+
+:root[data-theme="light"] .folder-hover-highlight {
+  background: linear-gradient(135deg, rgba(74, 103, 74, 0.12), rgba(255, 255, 255, 0.7));
+  border: 1px solid var(--border-color-light, #cbd5e1);
+}
+
+.folder-streamers-list {
+  position: relative;
+  z-index: 1;
 }
 
 .folder-streamers-list {
@@ -441,7 +572,7 @@ const getStreamerItemClass = (streamer: FollowedStreamer) => {
 }
 
 .folder-streamer-item:hover {
-  background: var(--hover-bg);
+  background: transparent;
 }
 
 .folder-header:hover .folder-name {

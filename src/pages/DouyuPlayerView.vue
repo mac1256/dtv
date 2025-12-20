@@ -196,7 +196,7 @@ onMounted(() => {
   height: 100%;
   min-height: 0;
   width: 100%;
-  background-color: #0e0e10; 
+  background-color: transparent;
   color: white;
   justify-content: center;
   align-items: stretch;
@@ -219,7 +219,7 @@ onMounted(() => {
 
 /* Day Mode Styles */
 :root[data-theme="light"] .player-view {
-  background-color: var(--main-bg-light, #ffffff);
+  background-color: transparent;
   color: var(--main-text-primary-light, #212529);
 }
 

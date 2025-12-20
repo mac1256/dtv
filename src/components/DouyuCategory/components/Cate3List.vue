@@ -57,55 +57,38 @@ const selectAll = () => {
 .cate3-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  margin: 2px 16px 0 16px;
+  gap: 10px;
+  margin: 2px 24px 0 24px;
   padding-bottom: 4px;
 }
 
 .cate3-item {
-  padding: 4px 12px;
-  height: 28px;
-  border-radius: 8px;
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 100px;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-sizing: border-box;
   display: inline-flex;
   align-items: center;
   font-size: 12px;
-  background: var(--secondary-bg);
-  border: 1px solid var(--border-color);
+  font-weight: 600;
+  background: var(--hover-bg);
+  border: none;
   color: var(--secondary-text);
-  font-weight: 450;
+  box-shadow: none;
 }
 
 .cate3-item:hover {
-  background: var(--tertiary-bg);
-  border-color: var(--accent-color);
+  background: var(--hover-bg);
   color: var(--primary-text);
+  transform: scale(1.04);
 }
 
 .cate3-item.active {
-  background: var(--accent-gradient);
-  border-color: transparent;
-  color: #fff;
-  font-weight: 600;
-}
-
-:root[data-theme="light"] .cate3-item {
-  background: #f4f4f5;
-  border: 1px solid #e4e4e7;
-  color: #71717a;
-}
-
-:root[data-theme="light"] .cate3-item:hover {
-  background: #e4e4e7;
-  color: #18181b;
-}
-
-:root[data-theme="light"] .cate3-item.active {
-  background: var(--accent-gradient);
-  border-color: transparent;
-  color: #fff;
+  background: var(--glass-bg);
+  color: var(--primary-text);
+  font-weight: 700;
 }
 
 .loading-cate3 {

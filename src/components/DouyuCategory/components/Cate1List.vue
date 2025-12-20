@@ -27,65 +27,46 @@ defineEmits<{
 
 <style scoped>
 .cate1-list {
-  padding: 10px 12px 8px;
+  padding: 12px 0 6px;
   display: flex;
-  gap: 12px;
+  gap: 16px;
   overflow-x: auto;
-  background: var(--cate1-list-bg-dark, #1f1f23);
+  background: transparent;
   flex-shrink: 0;
-  transition: background-color 0.3s ease;
-}
-
-:root[data-theme="light"] .cate1-list {
-  background-color: var(--primary-bg, #FFFFFF);
-  color: var(--primary-text);
+  transition: all 0.2s ease;
+  padding-left: 24px;
+  padding-right: 24px;
 }
 
 .cate1-item {
-  height: 40px;
-  padding: 0 12px;
+  height: 38px;
+  padding: 0 16px;
   cursor: pointer;
-  transition: background 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease, color 0.22s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   font-size: 13px;
-  border-radius: var(--radius-md);
+  font-weight: 600;
+  border-radius: 100px;
   white-space: nowrap;
-  border: 1px solid rgba(90, 176, 255, 0.14);
-  background: #1e2022;
-  color: rgba(227, 236, 255, 0.82);
+  background: var(--hover-bg);
+  color: var(--secondary-text);
   display: inline-flex;
   align-items: center;
-}
-
-:root[data-theme="light"] .cate1-item {
-  background: rgba(248, 250, 255, 0.92);
-  border-color: rgba(203, 213, 225, 0.6);
-  color: #334155;
   box-shadow: none;
 }
 
 .cate1-item:hover {
-  background: #272a2d;
-  border-color: rgba(125, 211, 252, 0.3);
-  color: rgba(236, 244, 255, 0.92);
-}
-
-:root[data-theme="light"] .cate1-item:hover {
-  background: rgba(241, 245, 255, 0.96);
-  border-color: rgba(148, 163, 184, 0.65);
-  color: #1f2f4d;
+  background: var(--hover-bg);
+  color: var(--primary-text);
+  transform: translateY(-1px);
 }
 
 .cate1-item.active {
-  background: #2c3036;
-  border: 1px solid #3b4147;
-  color: #f8fafc;
-  font-weight: 600;
+  background: var(--glass-bg);
+  color: var(--primary-text);
+  font-weight: 700;
 }
 
-:root[data-theme="light"] .cate1-item.active {
-  background: #e4e9e5;
-  border-color: #cfd3cf;
-  color: #111827;
-  font-weight: 600;
+.cate1-list::-webkit-scrollbar {
+  height: 0;
 }
 </style>

@@ -59,7 +59,7 @@ const CONTENT_PADDING_BOTTOM = 8;
 const GRID_INTERNAL_PADDING_BOTTOM = 18;
 
 const TARGET_CONTENT_HEIGHT_FOR_ONE_ROW = CARD_ACTUAL_HEIGHT + GRID_INTERNAL_PADDING_BOTTOM + CONTENT_PADDING_BOTTOM;
-const TARGET_CONTENT_HEIGHT_FOR_TWO_ROWS = (2 * CARD_ACTUAL_HEIGHT + GRID_VERTICAL_GAP) + GRID_INTERNAL_PADDING_BOTTOM + CONTENT_PADDING_BOTTOM - 6;
+const TARGET_CONTENT_HEIGHT_FOR_TWO_ROWS = (2 * CARD_ACTUAL_HEIGHT + GRID_VERTICAL_GAP) + GRID_INTERNAL_PADDING_BOTTOM + CONTENT_PADDING_BOTTOM - 14;
 const EXPANDED_CONTENT_MAX_ROWS = 7;
 const TARGET_CONTENT_HEIGHT_FOR_EXPANDED_MAX_ROWS = 
     (EXPANDED_CONTENT_MAX_ROWS * CARD_ACTUAL_HEIGHT + (EXPANDED_CONTENT_MAX_ROWS - 1) * GRID_VERTICAL_GAP) 
@@ -177,7 +177,7 @@ const handleToggleInternalExpand = () => {
 
 <style scoped>
 .cate2-container {
-  padding: 10px 24px 16px;
+  padding: 10px 24px 8px;
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -200,7 +200,7 @@ const handleToggleInternalExpand = () => {
   grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
   gap: 12px;
   justify-content: flex-start;
-  padding-bottom: 32px;
+  padding-bottom: 20px;
 }
 
 .cate2-card {
@@ -225,8 +225,8 @@ const handleToggleInternalExpand = () => {
 }
 
 .cate2-card.active {
-  background: #2c3036;
-  color: #f8fafc;
+  background: var(--glass-bg);
+  color: var(--primary-text);
   font-weight: 700;
   box-shadow: none;
 }
@@ -240,16 +240,14 @@ const handleToggleInternalExpand = () => {
   text-align: center;
 }
 
-:root[data-theme="light"] .cate2-card.active {
-  background: #e4e9e5;
-  color: #111827;
+.cate2-card.active {
+  /* theme-aware selected state uses glass background */
 }
 
 .expand-button {
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
+  position: relative;
+  align-self: center;
+  margin-top: 6px;
   display: inline-flex;
   align-items: center;
   gap: 6px;

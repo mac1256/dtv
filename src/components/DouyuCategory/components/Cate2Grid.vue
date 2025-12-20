@@ -50,17 +50,17 @@
 
     <div v-if="shouldShowExpandButtonComputed" class="expand-button" @click="handleToggleExpand">
       <span>{{ isExpanded ? '收起' : '展开' }}</span>
-      <motion.svg
-        class="expand-icon"
-        :animate="{ rotate: isExpanded ? 180 : 0 }"
-        width="16"
-        height="16"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-      >
-        <path d="M6 9l6 6 6-6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-      </motion.svg>
+      <span class="expand-icon" :class="{ 'is-expanded': isExpanded }">
+        <svg
+          width="12"
+          height="12"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+        >
+          <path d="M6 9l6 6 6-6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
     </div>
   </div>
 </template>
@@ -84,19 +84,18 @@ const emit = defineEmits<{
 }>()
 
 // Constants for height calculation
-const CARD_ACTUAL_HEIGHT = 42; 
-const GRID_VERTICAL_GAP = 12;  
-const CONTENT_PADDING_BOTTOM = 8; 
-const GRID_INTERNAL_PADDING_BOTTOM = 16; 
+const CARD_ACTUAL_HEIGHT = 36;
+const GRID_VERTICAL_GAP = 12;
+const CONTENT_PADDING_BOTTOM = 8;
+const GRID_INTERNAL_PADDING_BOTTOM = 18;
 
 const TARGET_CONTENT_HEIGHT_FOR_ONE_ROW = CARD_ACTUAL_HEIGHT + GRID_INTERNAL_PADDING_BOTTOM + CONTENT_PADDING_BOTTOM;
-const TARGET_CONTENT_HEIGHT_FOR_TWO_ROWS = (2 * CARD_ACTUAL_HEIGHT + GRID_VERTICAL_GAP) + GRID_INTERNAL_PADDING_BOTTOM + CONTENT_PADDING_BOTTOM;
+const TARGET_CONTENT_HEIGHT_FOR_TWO_ROWS = (2 * CARD_ACTUAL_HEIGHT + GRID_VERTICAL_GAP) + GRID_INTERNAL_PADDING_BOTTOM + CONTENT_PADDING_BOTTOM - 14;
 const EXPANDED_CONTENT_MAX_ROWS = 7;
 const TARGET_CONTENT_HEIGHT_FOR_EXPANDED_MAX_ROWS = (EXPANDED_CONTENT_MAX_ROWS * CARD_ACTUAL_HEIGHT + (EXPANDED_CONTENT_MAX_ROWS - 1) * GRID_VERTICAL_GAP) + GRID_INTERNAL_PADDING_BOTTOM + CONTENT_PADDING_BOTTOM;
 
 const cate2ContentRef = ref<HTMLElement | null>(null)
 const cate2GridRef = ref<HTMLElement | null>(null)
-const isAnimating = ref(false)
 const actualGridScrollHeight = ref(0)
 
 const getCurrentTargetHeight = (expandedState: boolean) => {
@@ -126,7 +125,8 @@ watch(() => props.cate2List, updateActualGridScrollHeight, { deep: true });
 onMounted(updateActualGridScrollHeight);
 
 const shouldShowExpandButtonComputed = computed(() => {
-  return (actualGridScrollHeight.value + CONTENT_PADDING_BOTTOM) > TARGET_CONTENT_HEIGHT_FOR_TWO_ROWS;
+  const requiredHeight = actualGridScrollHeight.value + CONTENT_PADDING_BOTTOM;
+  return requiredHeight > TARGET_CONTENT_HEIGHT_FOR_TWO_ROWS || props.hasMoreRows;
 });
 
 watch(() => props.isExpanded, (newValue) => {
@@ -164,16 +164,19 @@ const formatCategoryName = (name: string) => {
 
 <style scoped>
 .cate2-container {
-  padding: 8px 16px 12px;
+  padding: 10px 24px 8px;
   display: flex;
   flex-direction: column;
   flex: 1;
   position: relative;
+  overflow: visible;
+  background: transparent;
 }
 
 .cate2-content {
   position: relative;
   height: 0;
+  padding-bottom: 8px;
   overflow: hidden;
   transition: height 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: height;
@@ -200,103 +203,107 @@ const formatCategoryName = (name: string) => {
 
 .cate2-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  gap: 10px;
-  padding: 4px;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 12px;
+  justify-content: flex-start;
+  padding-bottom: 20px;
 }
 
 .cate2-card {
-  height: 40px; 
-  padding: 0 12px; 
-  border-radius: var(--radius-md);
+  height: 38px;
+  padding: 0 16px;
+  border-radius: 100px;
   cursor: pointer;
-  display: flex; 
-  align-items: center; 
-  gap: 10px; 
-  background: var(--secondary-bg);
-  border: 1px solid var(--border-color);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--hover-bg);
+  border: none;
   color: var(--secondary-text);
-  position: relative;
-  overflow: hidden;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: none;
 }
 
 .cate2-card:hover {
-  background: var(--tertiary-bg);
-  border-color: var(--accent-color);
+  background: var(--hover-bg);
   color: var(--primary-text);
-  transform: translateY(-1px);
+  transform: scale(1.05);
 }
 
 .cate2-card.active { 
-  background: #2c3036;
-  border-color: #3b4147;
-  color: #f8fafc;
-  font-weight: 600;
+  background: var(--glass-bg);
+  color: var(--primary-text);
+  font-weight: 700;
 }
 
 .cate2-icon {
-  width: 20px; 
-  height: 20px; 
-  flex-shrink: 0; 
+  display: none;
 }
 
 .cate2-icon img {
-  width: 100%; 
-  height: 100%; 
-  object-fit: contain; 
-  border-radius: 4px; 
+  display: none;
 }
 
 .cate2-card.active .cate2-icon img {
-  filter: brightness(0) invert(1);
+  filter: none;
 }
 
-:root[data-theme="light"] .cate2-card.active {
-  background: #e4e9e5;
-  border-color: #cfd3cf;
-  color: #111827;
+.cate2-card.active {
+  /* theme-aware selected state uses glass background */
 }
 
 .cate2-info {
   flex: 1;
   overflow: hidden;
+  text-align: center;
 }
 
 .cate2-name {
   font-size: 13px;
+  font-weight: 600;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  text-align: center;
 }
 
 .expand-button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 10px;
-  font-size: 12px;
-  cursor: pointer;
-  color: var(--secondary-text);
-  transition: all 0.2s ease;
-  margin: 0 16px;
-  background: var(--tertiary-bg);
-  border-radius: 20px;
-  width: fit-content;
+  position: relative;
   align-self: center;
-  margin-top: 8px;
-  border: 1px solid var(--border-color);
+  margin-top: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 14px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--secondary-text);
+  cursor: pointer;
+  border-radius: 100px;
+  background: var(--secondary-bg);
+  border: none;
+  transition: all 0.2s ease;
+  z-index: 5;
+  box-shadow: none;
 }
 
 .expand-button:hover {
+  background: var(--tertiary-bg);
   color: var(--primary-text);
-  background: var(--hover-bg);
   border-color: var(--accent-color);
 }
 
 .expand-icon {
-  margin-left: 6px;
-  width: 14px;
-  height: 14px;
+  margin-left: 2px;
+  width: 12px;
+  height: 12px;
+  transition: transform 0.4s cubic-bezier(0.33, 0.66, 0.66, 1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.expand-icon.is-expanded {
+  transform: rotate(180deg);
 }
 </style>

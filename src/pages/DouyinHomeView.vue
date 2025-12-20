@@ -50,8 +50,8 @@ function onCategorySelected(evt: CategorySelectedEvent) {
 
 .left-panel {
   width: 100%;
-  background: var(--glass-bg);
-  backdrop-filter: blur(8px);
+  background: transparent;
+  backdrop-filter: none;
   z-index: 10;
   overflow: hidden;
 }

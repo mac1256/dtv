@@ -148,9 +148,8 @@ const goToPlayer = (roomId: string) => {
   height: 100%;
   width: 100%;
   box-sizing: border-box;
-  background-color: transparent;
+  background: transparent;
   overflow: hidden; 
-  --squircle-radius: 1%;
 }
 
 .loading-initial-state,
@@ -171,15 +170,16 @@ const goToPlayer = (roomId: string) => {
 .live-grid-scroll-area {
   flex-grow: 1;
   overflow-y: auto;
-  padding: 12px 0;
+  padding: 6px;
+  --squircle-radius: 1%;
 }
 
 .live-grid-scroll-area::-webkit-scrollbar {
-  width: 6px;
+  width: 5px;
 }
 
 .live-grid-scroll-area::-webkit-scrollbar-thumb {
-  background: var(--border-color);
+  background: var(--glass-border);
   border-radius: 10px;
 }
 
@@ -211,7 +211,7 @@ const goToPlayer = (roomId: string) => {
   cursor: pointer;
   border: 1px solid var(--glass-border);
   transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-  padding: 10px;
+  padding: 8px;
 }
 
 .streamer-card-revised:hover {
@@ -259,12 +259,12 @@ const goToPlayer = (roomId: string) => {
 
 .viewers-count-overlay {
   position: absolute;
-  bottom: 8px;
+  top: 8px;
   right: 10px;
   background: rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  color: var(--primary-text);
+  color: #fff;
   padding: 2px 8px;
   border-radius: 100px;
   font-size: 9px;
@@ -278,8 +278,8 @@ const goToPlayer = (roomId: string) => {
 .card-info-footer-revised {
   display: flex;
   align-items: center;
-  padding: 0 8px;
-  gap: 10px;
+  padding: 6px 8px 2px 8px;
+  gap: 8px;
 }
 
 .avatar-container {
@@ -312,7 +312,6 @@ const goToPlayer = (roomId: string) => {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  letter-spacing: -0.1px;
   line-height: 1.2;
 }
 
@@ -320,15 +319,19 @@ const goToPlayer = (roomId: string) => {
   font-size: 11px;
   color: var(--secondary-text);
   font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
 }
 
 .mini-spinner {
-  width: 20px;
-  height: 20px;
-  border: 2px solid var(--border-color);
+  width: 36px;
+  height: 36px;
+  border: 4px solid var(--border-color);
   border-top-color: var(--accent-color);
   border-radius: 50%;
-  animation: spin 0.8s linear infinite;
+  animation: spin 1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
 @keyframes spin {
@@ -336,7 +339,7 @@ const goToPlayer = (roomId: string) => {
 }
 
 .scroll-sentinel {
-  height: 20px;
+  height: 60px;
 }
 
 .skeleton-grid {

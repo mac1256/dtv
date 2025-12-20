@@ -150,8 +150,8 @@ onMounted(() => {
   position: sticky; 
   top: 0;
   width: 100%;
-  background: var(--glass-bg);
-  backdrop-filter: blur(8px);
+  background: transparent;
+  backdrop-filter: none;
 }
 
 .live-list-section {

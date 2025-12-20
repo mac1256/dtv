@@ -264,7 +264,7 @@ export const registerPlayerWatchers = (ctx: PlayerWatcherContext) => {
     ],
     async (
       [newRoomId, newPlatform, newStreamUrl, newAvatar, newTitle, newAnchorName, newIsLive],
-      [oldRoomId, oldPlatform, oldStreamUrl, oldAvatar, oldTitle, oldAnchorName, oldIsLive],
+      [oldRoomId, oldPlatform, oldStreamUrl],
     ) => {
       if (newPlatform === StreamingPlatform.DOUYU) {
         playerTitle.value = newTitle;

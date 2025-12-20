@@ -136,10 +136,10 @@ const handleCate2GridHeightChanged = () => {
 .category-list {
   display: flex;
   flex-direction: column;
-  background: var(--primary-bg);
+  background: transparent;
   color: var(--primary-text);
   max-height: 280px;
-  min-height: 200px;
+  min-height: 160px;
   overflow: hidden;
   transition: max-height 0.3s ease;
   will-change: max-height;

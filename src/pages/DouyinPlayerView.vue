@@ -87,7 +87,7 @@ const handlePlayerReload = () => {
   height: 100%;
   min-height: 0;
   width: 100%;
-  background-color: #0e0e10;
+  background-color: transparent;
   color: white;
   align-items: stretch;
 }

@@ -50,7 +50,7 @@ const handleClosePlayer = () => {
   height: 100%;
   min-height: 0;
   width: 100%;
-  background-color: #0e0e10; /* Twitch-like dark background */
+  background-color: transparent;
   align-items: stretch;
 }
 </style> 

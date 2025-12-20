@@ -67,8 +67,8 @@ defineProps<{
 }
 
 .cate1-item.selected {
-  background: #2c3036;
-  color: #f8fafc;
+  background: var(--glass-bg);
+  color: var(--primary-text);
   font-weight: 700;
   box-shadow: none;
 }
@@ -82,8 +82,7 @@ defineProps<{
   height: 0;
 }
 
-:root[data-theme="light"] .cate1-item.selected {
-  background: #e4e9e5;
-  color: #111827;
+.cate1-item.selected {
+  /* theme-aware selected state uses glass background */
 }
 </style>

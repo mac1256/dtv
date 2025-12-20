@@ -43,8 +43,8 @@ const onCategorySelected = (categoryEvent: CategorySelectedEvent) => {
 
 .bili-category-section {
   flex-shrink: 0;
-  background: var(--glass-bg);
-  backdrop-filter: blur(8px);
+  background: transparent;
+  backdrop-filter: none;
   z-index: 10;
 }
 

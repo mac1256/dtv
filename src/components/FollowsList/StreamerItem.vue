@@ -1,14 +1,18 @@
 <template>
   <div class="streamer-item-content" :class="{ big: big }">
     <div class="item-content" @click="onClick">
-      <div class="avatar-container" :class="{ big: big }">
+      <div ref="avatarRef" class="avatar-container" :class="{ big: big }">
         <img 
-          v-if="streamer.avatarUrl && (streamer.platform !== Platform.BILIBILI || !!proxyBase)"
-          :src="getAvatarSrc(streamer)"
+          v-if="shouldLoadAvatar"
+          :src="avatarSrc"
           :alt="streamer.nickname"
+          loading="lazy"
+          decoding="async"
+          fetchpriority="low"
           @error="handleImgError($event, streamer)"
           class="avatar-image"
         >
+        <div v-else-if="canLoadAvatar" class="avatar-placeholder" aria-hidden="true"></div>
         <div v-else class="avatar-fallback">{{ streamer.nickname[0] }}</div>
       </div>
       
@@ -122,6 +126,14 @@
   border-radius: 50%;
 }
 
+.avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: var(--tertiary-bg);
+  border: 1px solid var(--border-color);
+}
+
 .streamer-details {
   display: flex;
   flex-direction: column;
@@ -201,23 +213,17 @@
 
 .live-indicator.is-live { 
   background: #10b981; 
-  box-shadow: 0 0 12px #10b981;
-  animation: breathing 2s ease-in-out infinite;
-}
-
-@keyframes breathing {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.2); opacity: 0.7; }
 }
 
 .live-indicator.is-replay { background: #f59e0b; box-shadow: 0 0 8px #f59e0b; }
 .live-indicator.is-offline { background: var(--border-color); }
+:root[data-theme="light"] .live-indicator.is-offline { background: #9ca3af; }
 </style>
 
 <script setup lang="ts">
 import { Platform } from '../../platforms/common/types';
 import type { FollowedStreamer } from '../../platforms/common/types';
-import { computed } from 'vue';
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
 
 const props = defineProps<{
   streamer: FollowedStreamer,
@@ -233,6 +239,49 @@ const emit = defineEmits<{ (e: 'clickItem', s: FollowedStreamer): void }>();
 
 const onClick = () => emit('clickItem', props.streamer);
 
+const canLoadAvatar = computed(() => {
+  return !!props.streamer.avatarUrl && (props.streamer.platform !== Platform.BILIBILI || !!props.proxyBase);
+});
+
+const isAvatarVisible = ref(false);
+const avatarRef = ref<HTMLElement | null>(null);
+let avatarObserver: IntersectionObserver | null = null;
+
+const setupAvatarObserver = () => {
+  if (!canLoadAvatar.value) {
+    isAvatarVisible.value = false;
+    return;
+  }
+  if (typeof window === 'undefined' || !('IntersectionObserver' in window)) {
+    isAvatarVisible.value = true;
+    return;
+  }
+  if (avatarObserver) {
+    avatarObserver.disconnect();
+    avatarObserver = null;
+  }
+  avatarObserver = new IntersectionObserver(
+    (entries) => {
+      const entry = entries[0];
+      if (entry?.isIntersecting) {
+        isAvatarVisible.value = true;
+        avatarObserver?.disconnect();
+        avatarObserver = null;
+      }
+    },
+    { rootMargin: '200px' }
+  );
+  if (avatarRef.value) {
+    avatarObserver.observe(avatarRef.value);
+  } else {
+    isAvatarVisible.value = true;
+  }
+};
+
+onMounted(setupAvatarObserver);
+watch(canLoadAvatar, setupAvatarObserver);
+onUnmounted(() => avatarObserver?.disconnect());
+
 const platformLabel = (p: Platform): string => {
   switch (p) {
     case Platform.DOUYU: return '斗鱼';
@@ -243,6 +292,8 @@ const platformLabel = (p: Platform): string => {
   }
 };
 
-const proxyBase = computed(() => props.proxyBase || '');
 const showPlatform = computed(() => !!props.showPlatform);
+
+const shouldLoadAvatar = computed(() => canLoadAvatar.value && isAvatarVisible.value);
+const avatarSrc = computed(() => (shouldLoadAvatar.value ? props.getAvatarSrc(props.streamer) : ''));
 </script>

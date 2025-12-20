@@ -156,7 +156,7 @@ const handleFullscreenChange = (isFullscreen: boolean) => {
 .app {
   display: flex;
   height: 100vh;
-  background: var(--primary-bg);
+  background: transparent;
   background-image: var(--page-mesh);
   background-attachment: fixed;
   color: var(--primary-text);
@@ -174,6 +174,25 @@ const handleFullscreenChange = (isFullscreen: boolean) => {
   height: 100%;
   display: flex;
   background: transparent;
+  position: relative;
+  overflow: hidden;
+}
+
+.sidebar-glass-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: var(--sidebar-overlay);
+  background-size: cover;
+  background-position: center;
+  opacity: var(--sidebar-overlay-opacity);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.sidebar-glass-panel > * {
+  position: relative;
+  z-index: 1;
 }
 
 .main-content {
@@ -193,8 +212,8 @@ const handleFullscreenChange = (isFullscreen: boolean) => {
   background: var(--glass-bg);
   backdrop-filter: var(--glass-blur);
   -webkit-backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-lg);
+  border: none;
+  border-radius: 0;
   box-shadow: var(--glass-shadow);
   overflow: hidden;
   position: relative;
@@ -211,8 +230,11 @@ const handleFullscreenChange = (isFullscreen: boolean) => {
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at 10% 10%, rgba(191, 255, 0, 0.05), transparent 40%),
-              radial-gradient(circle at 90% 90%, rgba(74, 103, 74, 0.1), transparent 40%);
+  background-image: var(--ambient-bg-image), var(--page-mesh);
+  background-size: cover, cover;
+  background-position: center, center;
+  filter: blur(18px) saturate(1.1) brightness(0.9);
+  opacity: var(--ambient-bg-opacity);
   z-index: -1;
   pointer-events: none;
 }
