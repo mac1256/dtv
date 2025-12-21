@@ -72,7 +72,7 @@ const handleReorderList = (reorderedList: FollowedStreamer[]) => {
   background: transparent;
   display: flex;
   flex-direction: column;
-  padding: 10px;
+  padding: 0 10px;
   gap: 24px;
   z-index: 100;
 }

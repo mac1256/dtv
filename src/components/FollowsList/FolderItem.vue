@@ -60,8 +60,8 @@
         ref="folderContentRef"
         @mouseleave="handleFolderContentMouseLeave"
         :initial="{ height: 0, opacity: 0 }"
-        :animate="{ height: 'auto', opacity: 1 }"
-        :exit="{ height: 0, opacity: 0 }"
+        :animate="{ height: folderContentHeight, opacity: 1 }"
+        :exit="{ height: 0, opacity: 0, transition: { type: 'tween', duration: 0.24, ease: [0.64, 0, 0.78, 0.39] } }"
         :transition="{ type: 'tween', duration: 0.24, ease: [0.22, 0.61, 0.36, 1] }"
         >
         <motion.div
@@ -165,6 +165,8 @@ const folderItems = computed(() => {
 });
 
 const folderContentRef = ref<HTMLElement | null>(null);
+const folderContentHeight = ref(0);
+let folderContentObserver: ResizeObserver | null = null;
 const folderItemRefs = new Map<number, HTMLElement>();
 const hoveredFolderIndex = ref<number | null>(null);
 const folderHoverHighlight = reactive({ x: 0, y: 0, width: 0, height: 0, visible: false });
@@ -207,6 +209,24 @@ const recomputeFolderHoverHighlight = () => {
   folderHoverHighlight.visible = true;
 };
 
+const updateFolderContentHeight = () => {
+  const contentEl = resolveElement(folderContentRef.value);
+  if (!contentEl) return;
+  folderContentHeight.value = contentEl.scrollHeight;
+};
+
+watch(folderContentRef, (current) => {
+  if (folderContentObserver) {
+    folderContentObserver.disconnect();
+    folderContentObserver = null;
+  }
+  const element = resolveElement(current);
+  if (!element) return;
+  folderContentObserver = new ResizeObserver(updateFolderContentHeight);
+  folderContentObserver.observe(element);
+  nextTick(updateFolderContentHeight);
+});
+
 const setFolderItemRef = (index: number, el: any) => {
   if (!el) {
     folderItemRefs.delete(index);
@@ -242,18 +262,28 @@ watch(folderItems, () => {
   folderItemRefs.clear();
   hoveredFolderIndex.value = null;
   folderHoverHighlight.visible = false;
-  nextTick(recomputeFolderHoverHighlight);
+  nextTick(() => {
+    recomputeFolderHoverHighlight();
+    updateFolderContentHeight();
+  });
 });
 
 watch(() => props.folder.expanded, (expanded) => {
   if (!expanded) {
     hoveredFolderIndex.value = null;
     folderHoverHighlight.visible = false;
+    folderContentHeight.value = 0;
+    return;
   }
+  nextTick(updateFolderContentHeight);
 });
 
 onBeforeUnmount(() => {
   folderItemRefs.clear();
+  if (folderContentObserver) {
+    folderContentObserver.disconnect();
+    folderContentObserver = null;
+  }
 });
 
 const toggleExpand = () => emit('toggleExpand', props.folder.id);
@@ -427,7 +457,7 @@ const getStreamerItemClass = (streamer: FollowedStreamer) => {
 .folder-item {
   position: relative;
   margin-bottom: 8px;
-  border-radius: 40px;
+  border-radius: 24px;
   background: var(--color-card);
   border: 1px solid var(--color-border);
   box-shadow: none;
@@ -443,8 +473,11 @@ const getStreamerItemClass = (streamer: FollowedStreamer) => {
 }
 
 .folder-item.is-drag-over {
-  border: 1px solid var(--accent-color);
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent-color) 35%, transparent);
+  border-color: rgba(255, 255, 255, 0.7);
+  box-shadow:
+    0 0 0 2px rgba(255, 255, 255, 0.55),
+    0 0 16px rgba(255, 255, 255, 0.45),
+    0 0 28px rgba(255, 255, 255, 0.3);
 }
 
 .folder-header {
@@ -464,7 +497,7 @@ const getStreamerItemClass = (streamer: FollowedStreamer) => {
 }
 
 .folder-item.is-drag-over .folder-header {
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent-color) 28%, transparent);
+  box-shadow: none;
 }
 
 .folder-icon {
@@ -570,6 +603,10 @@ const getStreamerItemClass = (streamer: FollowedStreamer) => {
 
 .folder-streamer-item:hover {
   background: transparent;
+}
+
+:root[data-theme="dark"] .folder-item :deep(.secondary-row) {
+  color: rgba(203, 213, 225, 0.7);
 }
 
 .folder-header:hover .folder-name {

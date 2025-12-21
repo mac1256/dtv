@@ -273,6 +273,7 @@
   const animationTimeout = ref<number | null>(null);
   const DRAG_MIN_PX = 6; // 小于该阈值视为点击/误触，取消拖拽
   const LONG_PRESS_MS = 220;
+  const FOLDER_HOVER_PADDING = 10;
   
   // 拖拽到文件夹相关状态
   const dragOverFolderId = ref<string | null>(null); // 当前悬停的文件夹ID
@@ -808,24 +809,29 @@
     
     // 如果正在拖拽主播项，检查是否悬停在文件夹上
     if (draggedItemType.value === 'streamer' && draggedStreamerKey.value) {
-      const element = document.elementFromPoint(e.clientX, e.clientY);
-      const folderElement = element?.closest('.folder-item');
-      if (folderElement) {
-        const folderId = folderElement.getAttribute('data-folder-id');
-        if (folderId) {
-          // 检查该主播是否已经在文件夹中
-          const folder = followStore.folders.find(f => f.id === folderId);
-          if (folder) {
-            const [rp, rid] = (draggedStreamerKey.value || '').split(':');
-            const normKey = `${String(rp || '').toUpperCase()}:${rid}`;
-            const exists = folder.streamerIds.some(id => {
-              const [p, i] = (id || '').split(':');
-              return `${String(p || '').toUpperCase()}:${i}` === normKey;
-            });
-            if (!exists) {
+      const folderElements = Array.from(document.querySelectorAll<HTMLElement>('.folder-item'));
+      const matchedFolder = folderElements.find((el) => {
+        const rect = el.getBoundingClientRect();
+        return (
+          e.clientX >= rect.left - FOLDER_HOVER_PADDING &&
+          e.clientX <= rect.right + FOLDER_HOVER_PADDING &&
+          e.clientY >= rect.top - FOLDER_HOVER_PADDING &&
+          e.clientY <= rect.bottom + FOLDER_HOVER_PADDING
+        );
+      });
+      const folderId = matchedFolder?.getAttribute('data-folder-id') || null;
+      if (folderId) {
+        const folder = followStore.folders.find(f => f.id === folderId);
+        if (folder) {
+          const [rp, rid] = (draggedStreamerKey.value || '').split(':');
+          const normKey = `${String(rp || '').toUpperCase()}:${rid}`;
+          const exists = folder.streamerIds.some(id => {
+            const [p, i] = (id || '').split(':');
+            return `${String(p || '').toUpperCase()}:${i}` === normKey;
+          });
+          if (!exists) {
             dragOverFolderId.value = folderId;
             return; // 悬停在文件夹上，不进行排序
-            }
           }
         }
       }

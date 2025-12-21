@@ -175,8 +175,8 @@ const cancelRename = () => {
 .dialog-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px);
+  background: rgba(7, 10, 18, 0.35);
+  backdrop-filter: blur(10px);
   z-index: 2000;
   display: flex;
   align-items: center;
@@ -184,29 +184,31 @@ const cancelRename = () => {
 }
 
 .dialog {
-  background: rgba(30, 30, 36, 0.98);
-  border: 1px solid rgba(96, 98, 112, 0.5);
-  border-radius: 12px;
-  padding: 20px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 22px 22px 18px;
   min-width: 320px;
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(12px);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
 }
 
 .dialog-title {
-  margin: 0 0 16px 0;
+  margin: 0 0 14px 0;
   font-size: 16px;
   font-weight: 600;
-  color: rgba(226, 232, 240, 0.95);
+  color: var(--primary-text);
+  letter-spacing: 0.01em;
 }
 
 .dialog-input {
   width: 100%;
-  padding: 10px 12px;
-  border: 1px solid rgba(96, 98, 112, 0.5);
-  border-radius: 8px;
-  background: rgba(40, 40, 46, 0.8);
-  color: rgba(226, 232, 240, 0.95);
+  padding: 11px 14px;
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--primary-text);
   font-size: 14px;
   margin-bottom: 16px;
   transition: border-color 0.2s ease;
@@ -214,7 +216,7 @@ const cancelRename = () => {
 
 .dialog-input:focus {
   outline: none;
-  border-color: rgba(125, 211, 252, 0.6);
+  border-color: color-mix(in srgb, var(--accent-color) 65%, transparent);
 }
 
 .dialog-actions {
@@ -224,30 +226,30 @@ const cancelRename = () => {
 }
 
 .dialog-btn {
-  padding: 8px 16px;
-  border: 1px solid rgba(96, 98, 112, 0.5);
-  border-radius: 6px;
-  background: rgba(148, 163, 184, 0.2);
-  color: rgba(226, 232, 240, 0.9);
+  padding: 8px 18px;
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--primary-text);
   font-size: 13px;
   cursor: pointer;
   transition: background 0.15s ease, border-color 0.15s ease;
 }
 
 .dialog-btn:hover {
-  background: rgba(148, 163, 184, 0.3);
-  border-color: rgba(148, 163, 184, 0.5);
+  background: rgba(255, 255, 255, 0.12);
+  border-color: color-mix(in srgb, var(--glass-border) 80%, transparent);
 }
 
 .dialog-btn.confirm {
-  background: rgba(125, 211, 252, 0.2);
-  border-color: rgba(125, 211, 252, 0.4);
-  color: rgba(125, 211, 252, 0.95);
+  background: color-mix(in srgb, var(--accent-color) 18%, transparent);
+  border-color: color-mix(in srgb, var(--accent-color) 45%, transparent);
+  color: var(--primary-text);
 }
 
 .dialog-btn.confirm:hover {
-  background: rgba(125, 211, 252, 0.3);
-  border-color: rgba(125, 211, 252, 0.6);
+  background: color-mix(in srgb, var(--accent-color) 30%, transparent);
+  border-color: color-mix(in srgb, var(--accent-color) 65%, transparent);
 }
 
 .dialog-enter-active,
@@ -282,8 +284,8 @@ const cancelRename = () => {
 }
 
 :root[data-theme="light"] .dialog {
-  background: rgba(255, 255, 255, 0.98);
-  border-color: rgba(209, 217, 234, 0.6);
+  background: var(--glass-bg);
+  border-color: var(--glass-border);
 }
 
 :root[data-theme="light"] .dialog-title {
@@ -291,33 +293,33 @@ const cancelRename = () => {
 }
 
 :root[data-theme="light"] .dialog-input {
-  background: rgba(255, 255, 255, 0.9);
-  border-color: rgba(209, 217, 234, 0.6);
+  background: rgba(255, 255, 255, 0.7);
+  border-color: var(--glass-border);
   color: #1f2937;
 }
 
 :root[data-theme="light"] .dialog-input:focus {
-  border-color: rgba(114, 147, 255, 0.6);
+  border-color: color-mix(in srgb, var(--accent-color) 55%, transparent);
 }
 
 :root[data-theme="light"] .dialog-btn {
-  background: rgba(148, 163, 184, 0.15);
-  border-color: rgba(209, 217, 234, 0.5);
+  background: rgba(255, 255, 255, 0.7);
+  border-color: var(--glass-border);
   color: #475569;
 }
 
 :root[data-theme="light"] .dialog-btn:hover {
-  background: rgba(148, 163, 184, 0.25);
+  background: rgba(255, 255, 255, 0.85);
 }
 
 :root[data-theme="light"] .dialog-btn.confirm {
-  background: rgba(114, 147, 255, 0.2);
-  border-color: rgba(114, 147, 255, 0.4);
-  color: #4f46e5;
+  background: color-mix(in srgb, var(--accent-color) 12%, transparent);
+  border-color: color-mix(in srgb, var(--accent-color) 40%, transparent);
+  color: #1f2937;
 }
 
 :root[data-theme="light"] .dialog-btn.confirm:hover {
-  background: rgba(114, 147, 255, 0.3);
-  border-color: rgba(114, 147, 255, 0.6);
+  background: color-mix(in srgb, var(--accent-color) 20%, transparent);
+  border-color: color-mix(in srgb, var(--accent-color) 55%, transparent);
 }
 </style>

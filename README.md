@@ -53,6 +53,13 @@
 
 <br>
 
+<div align="center">
+  <p>日间模式 - 关注列表悬浮窗</p>
+  <img src="images/iShot_light2.webp" alt="日间模式关注列表悬浮窗" style="width: 100%; max-width: 800px; display: block; margin-left: auto; margin-right: auto;">
+</div>
+
+<br>
+
 
 
 

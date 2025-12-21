@@ -87,7 +87,7 @@
           <path fill="currentColor" d="M12 2C6.477 2 2 6.485 2 12.02c0 4.424 2.865 8.176 6.839 9.5.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.342-3.369-1.342-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.004.071 1.532 1.034 1.532 1.034.892 1.53 2.341 1.088 2.91.833.091-.647.35-1.089.636-1.34-2.22-.253-4.555-1.113-4.555-4.951 0-1.094.39-1.988 1.029-2.688-.103-.253-.446-1.27.098-2.646 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.54 9.54 0 0 1 2.505.337c1.909-1.296 2.748-1.026 2.748-1.026.545 1.376.202 2.393.1 2.646.64.7 1.028 1.594 1.028 2.688 0 3.848-2.338 4.695-4.566 4.944.36.31.68.924.68 1.861 0 1.343-.012 2.427-.012 2.757 0 .269.18.58.688.481A10.02 10.02 0 0 0 22 12.02C22 6.485 17.523 2 12 2z"/>
         </svg>
       </button>
-      <button @click="toggleTheme" class="theme-btn" :class="{ 'is-animating': themeToggleAnimating, 'theme-btn--windows': shouldShowWindowsControls }" :title="effectiveTheme === 'dark' ? '切换到日间模式' : '切换到夜间模式'" data-tauri-drag-region="none">
+      <button @click="toggleTheme" class="theme-btn" :class="{ 'theme-btn--windows': shouldShowWindowsControls }" :title="effectiveTheme === 'dark' ? '切换到日间模式' : '切换到夜间模式'" data-tauri-drag-region="none">
         <Transition name="theme-icon" mode="out-in">
           <Sun v-if="effectiveTheme === 'dark'" key="sun" class="theme-icon" :stroke-width="1.8" />
           <Moon v-else key="moon" class="theme-icon" :stroke-width="1.8" />
@@ -318,22 +318,7 @@ const placeholderText = computed(() => {
   return '搜索主播';
 });
 
-const themeToggleAnimating = ref(false);
-let themeAnimationTimer: number | null = null;
-
-const triggerThemeAnimation = () => {
-  if (themeAnimationTimer !== null) {
-    window.clearTimeout(themeAnimationTimer);
-  }
-  themeToggleAnimating.value = true;
-  themeAnimationTimer = window.setTimeout(() => {
-    themeToggleAnimating.value = false;
-    themeAnimationTimer = null;
-  }, 360);
-};
-
 const toggleTheme = () => {
-  triggerThemeAnimation();
   const currentTheme = themeStore.getEffectiveTheme();
   if (currentTheme === 'light') {
     themeStore.setUserPreference('dark');
@@ -344,21 +329,17 @@ const toggleTheme = () => {
 
 const openGithub = async () => {
   try {
-    await openUrl('https://github.com');
+    await openUrl('https://github.com/chen-zeong/DTV/releases');
   } catch (error) {
     if (typeof window !== 'undefined') {
-      window.open('https://github.com', '_blank', 'noopener,noreferrer');
+      window.open('https://github.com/chen-zeong/DTV/releases', '_blank', 'noopener,noreferrer');
       return;
     }
     console.error('[Header] Failed to open GitHub', error);
   }
 };
 
-onBeforeUnmount(() => {
-  if (themeAnimationTimer !== null) {
-    window.clearTimeout(themeAnimationTimer);
-  }
-});
+onBeforeUnmount(() => {});
 
 let searchTimeout: number | null = null;
 
@@ -842,7 +823,7 @@ const tryEnterRoom = (roomId: string) => {
   align-items: center;
   justify-content: center;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: none;
 }
 
 .theme-btn:hover {
@@ -866,7 +847,7 @@ const tryEnterRoom = (roomId: string) => {
   align-items: center;
   justify-content: center;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: none;
 }
 
 .github-btn:hover {
@@ -879,6 +860,15 @@ const tryEnterRoom = (roomId: string) => {
 .github-btn svg {
   width: 20px;
   height: 20px;
+}
+
+
+:root[data-theme="dark"] .platforms-wrapper,
+:root[data-theme="dark"] .search-box,
+:root[data-theme="dark"] .theme-btn,
+:root[data-theme="dark"] .github-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.16);
 }
 
 .mini-spinner {
